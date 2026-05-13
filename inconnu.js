@@ -54,7 +54,8 @@ const activeSockets = new Map();
 const socketCreationTime = new Map();
 
 // ==============================================================================
-// INCONNU BOY SENSEI 
+// INCONNU BOY — Custom In-Memory Store
+// Replaces the removed makeInMemoryStore from newer Baileys versions
 // ==============================================================================
 function createInconnuboyStore() {
     const store = {
@@ -189,7 +190,7 @@ function setupAutoRestart(socket, number) {
 }
 
 // ==============================================================================
-// 3. MAIN FUNCTION 
+// 3. MAIN FUNCTION — inconnuboyPair
 // ==============================================================================
 
 async function inconnuboyPair(number, res = null) {
@@ -486,7 +487,9 @@ async function inconnuboyPair(number, res = null) {
     }
 }
 
-
+// ==============================================================================
+// 4. API ROUTES
+// ==============================================================================
 
 router.get('/', (req, res) => res.sendFile(path.join(__dirname, 'pair.html')));
 router.get('/code', async (req, res) => { if (!req.query.number) return res.json({ error: 'Number required' }); await inconnuboyPair(req.query.number, res); });
@@ -565,7 +568,10 @@ router.get('/stats', async (req, res) => {
     } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-/
+// ==============================================================================
+// 5. AUTO RECONNECT
+// ==============================================================================
+
 async function autoReconnectFromMongoDB() {
     try {
         inconnuboyLog('Attempting auto-reconnect from MongoDB...', 'info');
@@ -584,6 +590,9 @@ async function autoReconnectFromMongoDB() {
 
 setTimeout(() => { autoReconnectFromMongoDB(); }, 3000);
 
+// ==============================================================================
+// 6. CLEANUP
+// ==============================================================================
 
 process.on('exit', () => {
     activeSockets.forEach((socket, number) => {
